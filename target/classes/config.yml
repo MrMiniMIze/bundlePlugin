@@ -1,0 +1,23 @@
+gui:
+  rows: 3
+  filler:
+    material: GRAY_STAINED_GLASS_PANE
+    name: "&7"
+    lore: []
+
+purchase-button:
+  material: EMERALD
+  name: "&aPurchase Bundle"
+  lore:
+    - "&7Price: &6%price% &7credits"
+    - "&7Time Left: &e%timeleft%"
+    - "&7Click to buy!"
+
+confirm-menu:
+  title: "&cConfirm Purchase?"
+  confirm-item:
+    material: GREEN_WOOL
+    name: "&aConfirm"
+  cancel-item:
+    material: RED_WOOL
+    name: "&cCancel"

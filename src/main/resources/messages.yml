@@ -1,0 +1,18 @@
+# Plugin messages
+
+no-permission: "&cYou do not have permission to do that."
+player-only: "&cOnly players can use that command!"
+reload-success: "&aAll plugin configurations have been reloaded!"
+
+no-credits: "&cYou do not have enough credits to purchase this bundle!"
+bundle-locked: "&cYou must purchase the %previous% bundle before buying %bundle%!"
+already-purchased: "&cYou have already purchased the %bundle% bundle!"
+bundle-expired: "&cThe %bundle% bundle is expired!"
+bundle-not-started: "&cThe %bundle% bundle is not available yet!"
+purchase-success: "&aYou have successfully purchased the %bundle% bundle!"
+
+# Lore / GUI-specific lines
+bundle-expired-lore: "This bundle has expired."
+bundle-not-started-lore: "Not available yet!"
+bundle-starts-in-lore: "Starts in: %time%"
+bundle-ends-in-lore: "Ends in: %time%"

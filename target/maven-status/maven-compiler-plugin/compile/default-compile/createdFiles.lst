@@ -1,0 +1,15 @@
+me/minimize/bundleplugin/managers/BundleManager.class
+me/minimize/bundleplugin/gui/ConfirmStorage.class
+me/minimize/bundleplugin/managers/PurchaseManager.class
+me/minimize/bundleplugin/utils/TimeUtils.class
+me/minimize/bundleplugin/managers/BundleItem.class
+me/minimize/bundleplugin/gui/InventoryClickListener.class
+me/minimize/bundleplugin/config/MessagesConfiguration.class
+me/minimize/bundleplugin/commands/BundlesCommand.class
+me/minimize/bundleplugin/gui/BundleContentMenu.class
+me/minimize/bundleplugin/config/BundleConfiguration.class
+me/minimize/bundleplugin/gui/BundleMenu.class
+me/minimize/bundleplugin/managers/BundleInfo.class
+me/minimize/bundleplugin/BundlePlugin.class
+me/minimize/bundleplugin/gui/BundleConfirmMenu.class
+me/minimize/bundleplugin/config/PurchasedDataConfiguration.class
