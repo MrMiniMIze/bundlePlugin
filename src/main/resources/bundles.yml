@@ -2,60 +2,37 @@ bundles:
   starter:
     price: 50
     unlock: ""
-    start: "2025-02-01 09:00:00"
-    end: "2025-02-03 12:00:00"
-
+    start: ""
+    end: ""
     display:
-      material: STONE
+      material: DIRT                # a brown block
       name: "&eStarter Bundle"
       lore:
-        - "&7Get started with these awesome items!"
-        - "&7Suitable for beginners."
-
+        - "&7A simple starter kit"
     items:
-      # You can name these sections 0, 1, 2 or any string.
       "0":
         material: BOOK
         name: "&bBeginner Guide"
         lore:
-          - "&7A helpful book to start your journey."
+          - "&7A helpful guide to get started."
         commands:
           - "give %player% book 1"
-          - "say You have been granted a starter book!"
-      "1":
-        material: STONE_SWORD
-        name: "&7Basic Sword"
-        lore:
-          - "&7A simple sword for early combat."
-        commands:
-          - "give %player% stone_sword 1"
-          - "say %player% received a Stone Sword!"
 
   advanced:
     price: 100
     unlock: "starter"
-    start: "2025-02-01 09:00:00"
-    end: "2025-02-04 12:00:00"
-
+    start: ""
+    end: ""
     display:
-      material: IRON_SWORD
+      material: DIRT
       name: "&aAdvanced Bundle"
       lore:
-        - "&7An upgraded bundle with better gear!"
-        - "&7For more experienced adventurers."
-
+        - "&7Stronger items for advanced players."
     items:
       "0":
         material: IRON_SWORD
         name: "&fIron Blade"
         lore:
-          - "&7A stronger sword to fight tougher foes."
+          - "&7A strong sword for fighting mobs."
         commands:
           - "give %player% iron_sword 1"
-      "1":
-        material: IRON_HELMET
-        name: "&fIron Helmet"
-        lore:
-          - "&7Protect your head!"
-        commands:
-          - "give %player% iron_helmet 1"

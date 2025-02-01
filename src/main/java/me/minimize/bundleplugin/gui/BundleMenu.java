@@ -13,7 +13,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class BundleMenu {
 
@@ -27,38 +29,70 @@ public class BundleMenu {
     }
 
     public void open() {
+        // Grab all bundles
+        BundleManager manager = plugin.getBundleManager();
+        Collection<BundleInfo> allBundles = manager.getBundlesMap().values();
+        int total = allBundles.size();
+
+        // Title example: "X Bundles Available"
+        String title = ChatColor.GRAY.toString() + total + " Bundles Available";
+
+        // Determine inventory size from config (rows * 9)
         int rows = plugin.getBundleConfiguration().getGuiRows();
         int size = rows * 9;
-        inventory = Bukkit.createInventory(null, size, ChatColor.DARK_GRAY + "Bundles");
+        inventory = Bukkit.createInventory(null, size, title);
 
-        // Filler item from config "gui.filler"
-        ConfigurationSection guiSection = plugin.getBundleConfiguration().getConfig().getConfigurationSection("gui");
-        ItemStack fillerItem = null;
+        // Load the "gui" section
+        ConfigurationSection guiSection = plugin.getBundleConfiguration()
+                .getConfig()
+                .getConfigurationSection("gui");
+
+        // 1) Place filler items
         if (guiSection != null && guiSection.isConfigurationSection("filler")) {
-            fillerItem = createFillerItem(guiSection.getConfigurationSection("filler"));
+            placeFillerItems(guiSection.getConfigurationSection("filler"), size);
         }
 
-        // Fill with filler
-        if (fillerItem != null) {
-            for (int i = 0; i < size; i++) {
-                inventory.setItem(i, fillerItem);
+        // 2) Place bundles in the configured slots
+        List<Integer> bundleSlots = new ArrayList<>();
+        if (guiSection != null && guiSection.isList("bundle-slots")) {
+            bundleSlots = guiSection.getIntegerList("bundle-slots");
+        }
+
+        // Convert the bundle collection to a list so we can iterate in order
+        List<BundleInfo> bundlesList = new ArrayList<>(allBundles);
+
+        for (int i = 0; i < bundleSlots.size(); i++) {
+            if (i >= bundlesList.size()) break;  // No more bundles to place
+            int slot = bundleSlots.get(i);
+            if (slot >= 0 && slot < size) {
+                BundleInfo bundle = bundlesList.get(i);
+                ItemStack icon = createBundleIcon(bundle);
+                inventory.setItem(slot, icon);
             }
         }
 
-        // Put each bundle's display item
-        BundleManager manager = plugin.getBundleManager();
-        Collection<BundleInfo> allBundles = manager.getBundlesMap().values();
-        int index = 0;
-        for (BundleInfo bundle : allBundles) {
-            if (index >= size) break;
-            ItemStack icon = createBundleIcon(bundle);
-            inventory.setItem(index, icon);
-            index++;
-        }
-
+        // Open for the player
         player.openInventory(inventory);
     }
 
+    /**
+     * Places a filler item in the specified slots, as defined by the config.
+     */
+    private void placeFillerItems(ConfigurationSection fillerSec, int inventorySize) {
+        // Create the filler item
+        ItemStack fillerItem = createFillerItem(fillerSec);
+        // Read the "slots" array from config
+        List<Integer> fillerSlots = fillerSec.getIntegerList("slots");
+        for (int slot : fillerSlots) {
+            if (slot >= 0 && slot < inventorySize) {
+                inventory.setItem(slot, fillerItem);
+            }
+        }
+    }
+
+    /**
+     * Creates the filler item from the config section (material, name, lore).
+     */
     private ItemStack createFillerItem(ConfigurationSection fillerSec) {
         String matName = fillerSec.getString("material", "GRAY_STAINED_GLASS_PANE");
         Material mat = Material.GRAY_STAINED_GLASS_PANE;
@@ -72,6 +106,7 @@ public class BundleMenu {
         meta.setDisplayName(name);
 
         List<String> loreLines = fillerSec.getStringList("lore");
+        if (loreLines == null) loreLines = new ArrayList<>();
         List<String> finalLore = new ArrayList<>();
         for (String line : loreLines) {
             finalLore.add(ChatColor.translateAlternateColorCodes('&', line));
@@ -82,8 +117,11 @@ public class BundleMenu {
         return filler;
     }
 
+    /**
+     * Creates the icon shown for each bundle (material, name, lore).
+     */
     private ItemStack createBundleIcon(BundleInfo bundle) {
-        // Use the display info
+        // Try to parse the display material from the bundle
         Material mat = Material.STONE;
         try {
             mat = Material.valueOf(bundle.getDisplayMaterial().toUpperCase());
@@ -92,29 +130,29 @@ public class BundleMenu {
         ItemStack stack = new ItemStack(mat);
         ItemMeta meta = stack.getItemMeta();
 
+        // Display name
         String displayName = ChatColor.translateAlternateColorCodes('&', bundle.getDisplayName());
         meta.setDisplayName(displayName);
 
-        // Build lore
+        // Build lore from the bundle's displayLore
         List<String> lore = new ArrayList<>();
         for (String line : bundle.getDisplayLore()) {
             lore.add(ChatColor.translateAlternateColorCodes('&', line));
         }
 
-        // Price line
+        // Price
         lore.add(ChatColor.GRAY + "Price: " + ChatColor.GOLD + bundle.getPrice());
-        // Time-based lines
+
+        // Time lines
         if (bundle.isNotStarted()) {
             long diff = bundle.getStartTimestamp() - System.currentTimeMillis();
-            lore.add(ChatColor.RED + plugin.getMessagesConfiguration().getMessage("bundle-not-started-lore"));
-            lore.add(ChatColor.GRAY + plugin.getMessagesConfiguration().getMessage("bundle-starts-in-lore")
-                    .replace("%time%", TimeUtils.formatDuration(diff)));
+            lore.add(ChatColor.RED + "Not available yet!");
+            lore.add(ChatColor.GRAY + "Starts in: " + ChatColor.YELLOW + TimeUtils.formatDuration(diff));
         } else if (bundle.isExpired()) {
-            lore.add(ChatColor.RED + plugin.getMessagesConfiguration().getMessage("bundle-expired-lore"));
+            lore.add(ChatColor.RED + "Expired");
         } else {
             long remaining = bundle.getEndTimestamp() - System.currentTimeMillis();
-            lore.add(ChatColor.GRAY + plugin.getMessagesConfiguration().getMessage("bundle-ends-in-lore")
-                    .replace("%time%", TimeUtils.formatDuration(remaining)));
+            lore.add(ChatColor.GRAY + "Ends in: " + ChatColor.YELLOW + TimeUtils.formatDuration(remaining));
         }
 
         meta.setLore(lore);
